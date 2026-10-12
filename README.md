@@ -60,6 +60,21 @@ npm run demo:onchain
 `npm test` compiles the Solidity contract and runs both the MRV suite and the
 local-EVM contract suite. Current verified result: 18/18 tests passing.
 
+## Demo video
+
+The repository includes a 4-minute 18-second narrated, captioned walkthrough:
+
+- [`demo/CarbonGuard_IEEE_ClimateChain_Demo.mp4`](demo/CarbonGuard_IEEE_ClimateChain_Demo.mp4)
+
+With FFmpeg built with the `flite` and `libass` filters, reproduce it with:
+
+```bash
+npm run demo:video
+```
+
+The video covers the threat model, off-chain telemetry rejection, Solidity
+invariants, actual local-EVM output, test evidence, and the prototype limits.
+
 ## Tested invariants
 
 - Invalid emissions inputs fail closed.

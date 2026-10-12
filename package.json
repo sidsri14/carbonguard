@@ -8,7 +8,8 @@
     "compile": "node compile.mjs",
     "test": "npm run compile && node --test test/*.test.mjs",
     "demo": "node demo.mjs",
-    "demo:onchain": "npm run compile && node demo_contract.mjs"
+    "demo:onchain": "npm run compile && node demo_contract.mjs",
+    "demo:video": "node demo/build-video.mjs"
   },
   "keywords": [
     "climatechain",
