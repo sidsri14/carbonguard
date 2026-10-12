@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { EdgeTTS } from 'edge-tts-universal';
 
 const root = resolve(import.meta.dirname, '..');
 const rendered = resolve(import.meta.dirname, 'rendered');
@@ -11,7 +12,7 @@ const output = resolve(import.meta.dirname, 'CarbonGuard_IEEE_ClimateChain_Demo.
 
 const narration = [
   [
-    'CarbonGuard is an M R V audit gateway and Solidity carbon credit registry built for the I E E E ClimateChain Global Hackathon.',
+    'CarbonGuard is a measurement, reporting, and verification audit gateway with a Solidity carbon credit registry, built for the I triple E ClimateChain Global Hackathon.',
     'The project focuses on a narrow integrity problem: how to keep physical evidence, credit issuance, and retirement state consistent across an off-chain measurement pipeline and an on-chain registry.',
     'It validates bounded renewable energy telemetry, creates cryptographic attestations for accepted readings, and enforces single-use credit evidence plus permanent retirement.',
     'This is an inspectable prototype, not a claim of a deployed production carbon market.',
@@ -26,13 +27,13 @@ const narration = [
   [
     'The architecture has two trust domains.',
     'Off-chain, the gateway checks whether a sensor is registered, whether the energy value fits its physical capacity over the reported interval, and whether the timestamp moves forward.',
-    'An accepted record becomes an S H A two fifty six attestation and enters a tamper-evident audit chain.',
-    'On-chain, CarbonCreditRegistry accepts mint calls only from its configured M R V oracle.',
-    'It stores the attestation hash, owner, C O two e quantity, metadata hash, issue time, and lifecycle status.',
+    'An accepted record becomes a SHA-256 attestation and enters a tamper-evident audit chain.',
+    'On-chain, CarbonCreditRegistry accepts mint calls only from its configured verification oracle.',
+    'It stores the attestation hash, owner, carbon dioxide equivalent quantity, metadata hash, issue time, and lifecycle status.',
     'Retirement requires the current owner and changes the status permanently.',
   ],
   [
-    'Here is the verified M R V behavior from the local demonstration.',
+    'Here is the verified measurement and reporting behavior from the local demonstration.',
     'A registered one megawatt solar array reports eight hundred twenty kilowatt hours for one hour. That value is within the configured ceiling, so the gateway accepts it and emits an attestation hash.',
     'The same array then reports three thousand kilowatt hours for one hour.',
     'CarbonGuard blocks the reading with anomaly capacity exceeded because the value is above the one thousand fifty kilowatt hour ceiling, including a five percent tolerance.',
@@ -41,22 +42,22 @@ const narration = [
   ],
   [
     'The Solidity registry owns the invariants that must not depend on application memory.',
-    'Minting requires the configured oracle, non-zero identifiers, a positive C O two e quantity, and an attestation hash that has never been used.',
+    'Minting requires the configured oracle, non-zero identifiers, a positive carbon dioxide equivalent quantity, and an attestation hash that has never been used.',
     'Retirement requires an active credit, the current owner, and a beneficiary hash.',
     'After retirement, the credit can never return to active status.',
-    'The contract compiles to a one thousand seven hundred ninety six byte optimized runtime with two hundred optimizer runs.',
-    'Tests execute the bytecode in a real local E V M instead of mocking contract calls.',
+    'The contract compiles to a 1,796-byte optimized runtime with two hundred optimizer runs.',
+    'Tests execute the bytecode in a real local Ethereum virtual machine instead of mocking contract calls.',
   ],
   [
-    'This is the actual local E V M demo output.',
-    'The registry deploys to a deterministic test address and accepts a credit representing two hundred forty seven thousand eight hundred grams of C O two e.',
+    'This is the actual local Ethereum virtual machine demo output.',
+    'The registry deploys to a deterministic test address and accepts a credit representing two hundred forty seven thousand eight hundred grams of carbon dioxide equivalent.',
     'A second credit tries to reuse the same attestation hash and reverts with AttestationAlreadyUsed.',
     'The owner then retires the credit, changing its status to Retired and recording the timestamp.',
     'A second retirement attempt reverts with CreditNotActive.',
     'Separate tests prove that a non-oracle cannot mint and a non-owner cannot retire.',
   ],
   [
-    'The current repository passes eighteen of eighteen M R V and local E V M tests.',
+    'The current repository passes eighteen of eighteen verification and local Ethereum virtual machine tests.',
     'Both the complete dependency audit and the production-only audit report zero vulnerabilities.',
     'GitHub Actions reproduces the build across Node twenty, twenty two, and twenty four.',
     'The limits are deliberate and documented.',
@@ -105,15 +106,17 @@ for (let index = 0; index < narration.length; index += 1) {
   const slideNumber = index + 1;
   const text = narration[index].join(' ');
   const narrationFile = resolve(work, `narration-${slideNumber}.txt`);
-  const audio = resolve(work, `narration-${slideNumber}.wav`);
+  const audio = resolve(work, `narration-${slideNumber}.mp3`);
   const segment = resolve(work, `segment-${slideNumber}.mp4`);
   writeFileSync(narrationFile, `${text}\n`);
 
-  run('ffmpeg', [
-    '-y', '-loglevel', 'error',
-    '-f', 'lavfi', '-i', `flite=textfile='demo/work/narration-${slideNumber}.txt':voice=slt`,
-    '-ar', '48000', '-ac', '1', audio,
-  ]);
+  const tts = new EdgeTTS(text, 'en-IN-NeerjaExpressiveNeural', {
+    rate: '+15%',
+    volume: '+0%',
+    pitch: '-2Hz',
+  });
+  const result = await tts.synthesize();
+  writeFileSync(audio, Buffer.from(await result.audio.arrayBuffer()));
 
   const spoken = duration(audio);
   const segmentDuration = spoken + 1.25;

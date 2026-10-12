@@ -62,12 +62,12 @@ local-EVM contract suite. Current verified result: 18/18 tests passing.
 
 ## Demo video
 
-The repository includes a 4-minute 18-second narrated, captioned walkthrough:
+The repository includes a 4-minute 41-second narrated, captioned walkthrough:
 
-- [Watch on YouTube](https://youtu.be/1-yY4xgVH3U)
+- [Watch on YouTube](https://youtu.be/u3ZuCOxMe7s)
 - [`demo/CarbonGuard_IEEE_ClimateChain_Demo.mp4`](demo/CarbonGuard_IEEE_ClimateChain_Demo.mp4)
 
-With FFmpeg built with the `flite` and `libass` filters, reproduce it with:
+With FFmpeg built with the `libass` filter and network access for neural narration, reproduce it with:
 
 ```bash
 npm run demo:video
