@@ -1,0 +1,23 @@
+{
+  "name": "carbonguard",
+  "version": "1.0.0",
+  "description": "Deterministic MRV Audit Gateway & On-Chain Carbon Credit Verification Oracle (IEEE ClimateChain)",
+  "main": "src/index.mjs",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/carbonguard.test.mjs",
+    "demo": "node demo.mjs"
+  },
+  "keywords": [
+    "climatechain",
+    "ieee",
+    "carbon-credits",
+    "mrv",
+    "web3",
+    "iot-attestation",
+    "ghg-protocol",
+    "blockchain"
+  ],
+  "author": "Siddharth Srivastava (sidsri14)",
+  "license": "MIT"
+}
