@@ -64,6 +64,7 @@ local-EVM contract suite. Current verified result: 18/18 tests passing.
 
 The repository includes a 4-minute 18-second narrated, captioned walkthrough:
 
+- [Watch on YouTube](https://youtu.be/1-yY4xgVH3U)
 - [`demo/CarbonGuard_IEEE_ClimateChain_Demo.mp4`](demo/CarbonGuard_IEEE_ClimateChain_Demo.mp4)
 
 With FFmpeg built with the `flite` and `libass` filters, reproduce it with:
