@@ -1,6 +1,6 @@
 /**
- * CarbonGuard GHG Protocol Emissions Calculator
- * Deterministic calculation engine for Scope 1, 2, and 3 emissions
+ * CarbonGuard emissions calculator.
+ * Deterministic Scope 1, 2, and 3 examples using the disclosed factor table.
  */
 
 export const EMISSION_FACTORS = {

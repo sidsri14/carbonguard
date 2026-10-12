@@ -1,5 +1,6 @@
 /**
- * CarbonGuard — MRV Audit Gateway & On-Chain Carbon Credit Verification Oracle
+ * CarbonGuard - off-chain MRV gateway and deterministic reference model.
+ * On-chain lifecycle enforcement lives in contracts/CarbonCreditRegistry.sol.
  */
 
 import { GHGCalculator } from './ghg_calculator.mjs';

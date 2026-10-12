@@ -1,98 +1,87 @@
-# 🌍 CarbonGuard: MRV Audit Gateway & On-Chain Carbon Credit Verification Oracle
+# CarbonGuard
 
-> **Competition**: IEEE ClimateChain Global Hackathon (`https://ieee-climatechain-hack.devpost.com/`)  
-> **Theme**: Blockchain, Machine Learning / AI, IoT & Web3 for Real-World Climate Impact  
-> **Prize Pool**: $3,000 USD (IEEE Turkey / Global)  
-> **Author**: Siddharth Srivastava (`@sidsri14`)  
-> **Status**: **Production Ready — 13/13 Tests Passing**
+CarbonGuard is a prototype MRV (measurement, reporting, and verification) gateway
+for the IEEE ClimateChain Global Hackathon. It validates bounded renewable-energy
+telemetry, produces deterministic carbon-accounting records, and anchors credit
+lifecycle invariants in a Solidity registry.
 
----
+## What is implemented
 
-## ⚡ Executive Summary
+### Off-chain MRV gateway
 
-Voluntary carbon markets and renewable energy certificate (REC) trading currently suffer from systemic vulnerabilities:
-1. **Greenwashing & Paper Credits**: Carbon credits minted on-chain without verifiable physical evidence from real-world IoT sensors.
-2. **Double-Counting & Re-selling**: Retired or burned credits re-traded across fragmented chains or registries due to lack of deterministic lifecycle enforcement.
-3. **Calculation Drift & Hallucinations**: Carbon accounting software and AI agents using arbitrary emission factors instead of strict Greenhouse Gas (GHG) Protocol Corporate Standard formulas.
-4. **Sensor Spoofing & Anomalies**: Malicious operators falsifying solar or wind energy output readings to mint fraudulent carbon credits.
+- Scope 1, Scope 2, and Scope 3 calculation examples using an explicit factor table.
+- Registered-sensor checks, physical capacity bounds, and monotonic timestamps.
+- SHA-256 attestations for accepted telemetry.
+- A tamper-evident SHA-256 audit chain.
+- An in-memory reference lifecycle used to demonstrate mint and retirement flows.
 
-**`CarbonGuard`** is an open-source, edge-to-chain MRV (Measurement, Reporting, Verification) audit gateway and verification oracle:
-- **GHG Protocol Standard Calculations**: Deterministic calculation engine for Scope 1 (fuel combustion), Scope 2 (grid electricity with regional grid factors), and Scope 3 (freight transport).
-- **IoT Sensor Attestation Engine**: Validates real-time energy generation telemetry from registered solar and clean energy arrays, automatically detecting anomalies and capacity overruns.
-- **On-Chain Credit Lifecycle & Anti-Double-Counting**: Enforces 1 Credit = 1000 kg (1 Metric Tonne) avoided CO2e, prevents double-minting with SHA-256 attestation tracking, and enforces permanent, non-reusable retirement with explicit beneficiary attribution.
-- **Tamper-Evident SHA-256 MRV Audit Ledger**: Append-only cryptographic hash chain recording all emissions calculations, attestations, mints, and retirements.
+The calculation examples are methodology-aligned prototypes, not certified carbon
+accounting. The bundled factors are disclosed in `src/ghg_calculator.mjs`; they must
+be replaced with jurisdiction-, year-, and activity-specific factors before real
+reporting.
 
----
+### On-chain registry
 
-## 🏛️ Architecture & System Dataflow
+`contracts/CarbonCreditRegistry.sol` is a real Solidity enforcement layer. It:
+
+- permits minting only from the configured MRV oracle;
+- prevents the same attestation hash from minting twice;
+- records owner, CO2e quantity, metadata hash, and issue timestamp;
+- permits retirement only by the credit owner; and
+- makes retirement irreversible.
+
+The contract is compiled with `solc` and executed in a real local EVM during tests.
+It is not deployed to a public chain, and this prototype does not claim a production
+token, live sensor fleet, or certified registry integration.
+
+## Architecture
 
 ```mermaid
-flowchart TD
-    A[IoT Renewable Solar/Wind Sensors] -->|Telemetry: kWh, Timestamp| B[CarbonGuard Ingestion Gateway]
-    
-    subgraph IoTAttestation [Sensor Attestation & Anomaly Guard]
-        B --> C{Registered Sensor?}
-        C -->|No| D[Reject: UNREGISTERED_SENSOR]
-        C -->|Yes| E{Generation <= Physical Capacity?}
-        E -->|No| F[Flag Anomaly: CAPACITY_EXCEEDED]
-        E -->|Yes| G[Sign SHA-256 Telemetry Attestation]
-    end
-
-    subgraph OnChainCredit [On-Chain Credit Minting & Retirement]
-        G --> H{Attestation Hash Used?}
-        H -->|Yes| I[Block: DOUBLE_MINT_PREVENTED]
-        H -->|No| J[Mint Verified Carbon Credit Token]
-        J --> K[Active Carbon Credit: 1 Credit = 1 Tonne CO2e]
-        K -->|Retire / Offset| L{Already Retired?}
-        L -->|Yes| M[Reject: DOUBLE_COUNTING_BLOCKED]
-        L -->|No| N[Permanent Retirement & Beneficiary Receipt]
-    end
-
-    G --> O[Cryptographic SHA-256 MRV Audit Ledger]
-    J --> O
-    N --> O
+flowchart LR
+  A[IoT telemetry] --> B[Capacity and replay checks]
+  B --> C[SHA-256 attestation]
+  C --> D[Off-chain MRV audit chain]
+  C --> E[CarbonCreditRegistry]
+  E --> F[Active credit]
+  F --> G[Irreversible retirement]
 ```
 
----
+## Run it
 
-## 🚀 Quickstart & Verification
+Requires Node.js 20 or newer.
 
 ```bash
-# Clone the repository
-git clone https://github.com/sidsri14/carbonguard.git
-cd carbonguard
-
-# Run the 13/13 automated test suite
+npm install
 npm test
-
-# Run the live interactive terminal demonstration
 npm run demo
+npm run demo:onchain
 ```
 
----
+`npm test` compiles the Solidity contract and runs both the MRV suite and the
+local-EVM contract suite. Current verified result: 18/18 tests passing.
 
-## 🧪 Verified Test Suite (13/13 Passing)
+## Tested invariants
 
-```text
-▶ CarbonGuard MRV & Carbon Credit Verification Suite
-  ✔ Test 1: Scope 1 diesel combustion calculation matches GHG Protocol (1.3ms)
-  ✔ Test 2: Scope 2 electricity emissions calculated with regional factors (0.3ms)
-  ✔ Test 3: Scope 3 freight logistics emissions calculated (0.3ms)
-  ✔ Test 4: Invalid/negative emission inputs fail-closed (0.5ms)
-  ✔ Test 5: Legitimate IoT telemetry from registered solar farm verified (1.2ms)
-  ✔ Test 6: Telemetry from unregistered sensor rejected (0.2ms)
-  ✔ Test 7: Generation exceeding physical capacity flagged as anomaly (0.2ms)
-  ✔ Test 8: Replay attack with non-monotonic timestamp rejected (0.2ms)
-  ✔ Test 9: Carbon credit is minted against verified sensor attestation (0.6ms)
-  ✔ Test 10: Double-mint with same attestation hash is strictly blocked (0.2ms)
-  ✔ Test 11: Credit retirement is permanent and prevents double-counting (0.3ms)
-  ✔ Test 12: Tamper-evident SHA-256 MRV audit ledger verifies integrity (0.3ms)
-✔ CarbonGuard MRV & Carbon Credit Verification Suite (8.4ms)
-```
+- Invalid emissions inputs fail closed.
+- Unregistered, over-capacity, and replayed telemetry is rejected.
+- A verified attestation produces a deterministic hash.
+- A used attestation cannot mint another on-chain credit.
+- A non-oracle address cannot mint.
+- A non-owner cannot retire a credit.
+- A retired credit cannot be retired again.
+- The off-chain audit chain detects mutation.
 
----
+## Limits
 
-## 📜 Devpost Submission Artifacts
+- No public-chain deployment or production custody.
+- No ERC-20, ERC-721, ERC-1155, or registry interoperability claim.
+- Sensor identity is registered locally; hardware signatures are future work.
+- Factor governance, versioning, and third-party verification are future work.
+- This code is a hackathon prototype, not a certified offset issuance system.
 
-- **Submission Dossier**: [`d:/distro/hackathons/ieee_climatechain_submission.md`](../hackathons/ieee_climatechain_submission.md)
-- **License**: MIT
+## Submission
+
+- Competition: IEEE ClimateChain Global Hackathon 2026
+- Track: Carbon Markets and Emissions Transparency
+- Author: Siddharth Srivastava (`sidsri14`)
+- License: MIT

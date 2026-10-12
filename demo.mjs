@@ -1,13 +1,13 @@
 /**
- * CarbonGuard End-to-End Live Demonstration
- * Showcasing GHG Protocol calculations, IoT telemetry verification, carbon credit minting, and anti-double-counting
+ * CarbonGuard off-chain MRV demonstration.
+ * Run `npm run demo:onchain` for the Solidity registry flow.
  */
 
 import { CarbonGuard } from './src/carbon_guard.mjs';
 
 async function runDemo() {
   console.log('='.repeat(70));
-  console.log('🌱 CARBONGUARD: MRV AUDIT GATEWAY & ON-CHAIN CARBON CREDIT ORACLE');
+  console.log('CARBONGUARD: OFF-CHAIN MRV GATEWAY AND AUDIT PIPELINE');
   console.log('   IEEE ClimateChain Global Hackathon (Blockchain × AI × Web3)');
   console.log('='.repeat(70));
 
@@ -19,7 +19,7 @@ async function runDemo() {
     maxCapacityKw: 1000, // 1 MW facility
   });
 
-  console.log('\n[STAGE 1] Testing GHG Protocol Scope 1, 2, and 3 Emissions Engine:');
+  console.log('\n[STAGE 1] Testing Scope 1, 2, and 3 calculations with the disclosed factor table:');
   const s1 = guard.calculateEmissions(1, { fuelType: 'DIESEL_LITER', quantity: 250 });
   console.log(`  ▶ Scope 1 (Diesel Combustion): 250 Liters -> ${s1.co2eKg} kg CO2e (${s1.co2eTonnes} tonnes CO2e)`);
 
@@ -52,10 +52,10 @@ async function runDemo() {
   console.log(`  ▶ Spoofed Reading: 3,000 kWh from 1 MW solar array`);
   console.log(`    Status: ${rogueRes.verified ? '✅ VERIFIED' : '❌ BLOCKED'} (${rogueRes.reason}: ${rogueRes.message})`);
 
-  console.log('\n[STAGE 4] Minting Verified On-Chain Carbon Credits:');
+  console.log('\n[STAGE 4] Preparing a Verified Credit in the Off-Chain Reference Model:');
   const mintRes = guard.mintCredit(attestation);
   console.log(`  ▶ Minting Carbon Credit from Attestation Hash...`);
-  console.log(`    Status: ${mintRes.success ? '✅ MINTED' : '❌ FAILED'}`);
+  console.log(`    Status: ${mintRes.success ? 'PREPARED' : 'FAILED'}`);
   console.log(`    Credit ID: ${mintRes.credit?.creditId}`);
   console.log(`    Avoided Emissions: ${mintRes.credit?.tonnesCO2e} Metric Tonnes CO2e`);
 
@@ -84,11 +84,11 @@ async function runDemo() {
 
   console.log('\n[STAGE 7] Verifying Tamper-Evident SHA-256 MRV Audit Chain:');
   const proof = guard.verifyLedger();
-  console.log(`  ▶ Cryptographic Audit Proof: ${proof.valid ? '✅ VALID (100% IMMUTABLE)' : '❌ TAMPERED'}`);
+  console.log(`  ▶ Cryptographic Audit Proof: ${proof.valid ? 'VALID (TAMPER EVIDENT)' : 'TAMPERED'}`);
   console.log(`  ▶ Audit Blocks Recorded: ${proof.length}`);
   console.log(`  ▶ Head Block Hash: ${proof.headHash}`);
 
-  console.log('\n🎉 ALL 7/7 CARBONGUARD MRV INVARIANTS VERIFIED AT LINE SPEED!\n');
+  console.log('\nALL 7/7 OFF-CHAIN MRV INVARIANTS VERIFIED.\n');
 }
 
 runDemo().catch(console.error);

@@ -1,5 +1,6 @@
 /**
- * CarbonGuard On-Chain Carbon Credit Verifier & Anti-Double-Counting Engine
+ * CarbonGuard off-chain credit lifecycle model.
+ * The Solidity registry in contracts/ is the on-chain enforcement layer.
  */
 
 import { randomUUID } from 'node:crypto';
@@ -12,7 +13,7 @@ export class CarbonCreditVerifier {
   }
 
   /**
-   * Mints verified on-chain carbon credits backed by verified sensor attestation
+   * Prepares a credit in the off-chain model from a verified sensor attestation
    * Standard: 1 Credit = 1 Metric Tonne (1000 kg) avoided/sequestered CO2e
    */
   mintCredit(attestation) {
@@ -54,7 +55,7 @@ export class CarbonCreditVerifier {
       avoidedKg,
       mintTimestamp: Date.now(),
       status: 'ACTIVE',
-      owner: '0x995e83A37178978b891a52222442B8aE20344c67',
+      owner: 'local-demo-owner',
     };
 
     this.mintedCredits.set(creditId, creditRecord);
@@ -67,7 +68,7 @@ export class CarbonCreditVerifier {
   }
 
   /**
-   * Retires a carbon credit permanently on-chain
+   * Retires a carbon credit permanently in the off-chain reference model
    */
   retireCredit(creditId, beneficiary, retirementReason) {
     const credit = this.mintedCredits.get(creditId);

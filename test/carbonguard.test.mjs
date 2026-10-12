@@ -6,12 +6,12 @@ test('CarbonGuard MRV & Carbon Credit Verification Suite', async (t) => {
   const guard = new CarbonGuard();
 
   // Register an authorized IoT solar facility
-  guard.sensors.registerSensor('SENSOR_SOLAR_RAJASTHAN_01', {
+  guard.sensors.registerSensor('SENSOR_SOLAR_LUCKNOW_01', {
     facilityType: 'SOLAR_FARM',
     maxCapacityKw: 500, // 500 kW capacity
   });
 
-  await t.test('Test 1: Scope 1 diesel combustion calculation matches GHG Protocol', () => {
+  await t.test('Test 1: Scope 1 diesel combustion calculation matches the disclosed factor table', () => {
     // 100 liters diesel * 2.68 kg/L = 268 kg CO2e = 0.268 tonnes
     const res = guard.calculateEmissions(1, { fuelType: 'DIESEL_LITER', quantity: 100 });
     assert.equal(res.scope, 1);
@@ -54,7 +54,7 @@ test('CarbonGuard MRV & Carbon Credit Verification Suite', async (t) => {
 
   await t.test('Test 5: Legitimate IoT telemetry from registered solar farm verified', () => {
     const telemetry = {
-      sensorId: 'SENSOR_SOLAR_RAJASTHAN_01',
+      sensorId: 'SENSOR_SOLAR_LUCKNOW_01',
       timestamp: 1728000000,
       generationKWh: 350, // within 500 kW capacity * 1h
       durationHours: 1,
@@ -77,7 +77,7 @@ test('CarbonGuard MRV & Carbon Credit Verification Suite', async (t) => {
 
   await t.test('Test 7: Generation exceeding physical capacity flagged as anomaly', () => {
     const telemetry = {
-      sensorId: 'SENSOR_SOLAR_RAJASTHAN_01',
+      sensorId: 'SENSOR_SOLAR_LUCKNOW_01',
       timestamp: 1728003600,
       generationKWh: 1500, // exceeds 500 kW capacity
       durationHours: 1,
@@ -89,7 +89,7 @@ test('CarbonGuard MRV & Carbon Credit Verification Suite', async (t) => {
 
   await t.test('Test 8: Replay attack with non-monotonic timestamp rejected', () => {
     const telemetry = {
-      sensorId: 'SENSOR_SOLAR_RAJASTHAN_01',
+      sensorId: 'SENSOR_SOLAR_LUCKNOW_01',
       timestamp: 1728000000, // duplicate timestamp <= lastTimestamp
       generationKWh: 200,
     };
